@@ -1,0 +1,48 @@
+services:
+  rag-api:
+    build:
+      context: ./task1_rag_assistant
+      dockerfile: Dockerfile
+    env_file: [.env]
+    environment:
+      CHROMA_DIR: /app/chroma_db
+      VLLM_BASE_URL: http://vllm:8000/v1
+    volumes:
+      - rag_chroma:/app/chroma_db
+      - rag_uploads:/app/uploads
+    ports: ["8001:8001"]
+
+  router-api:
+    build:
+      context: ./task2_production_router
+      dockerfile: backend/Dockerfile
+    env_file: [.env]
+    environment:
+      ROUTER_MODEL_DIR: /app/model/week14_distilbert_router
+    ports: ["8002:8002"]
+
+  router-ui:
+    build:
+      context: ./task2_production_router
+      dockerfile: frontend/Dockerfile
+    environment:
+      ROUTER_API_URL: http://router-api:8002
+    depends_on: [router-api]
+    ports: ["8501:8501"]
+
+  vllm:
+    image: vllm/vllm-openai:latest
+    profiles: [local-llm]
+    gpus: all
+    ipc: host
+    command: ["--model", "Qwen/Qwen3-0.6B"]
+    volumes:
+      - hf_cache:/root/.cache/huggingface
+      - vllm_cache:/root/.cache/vllm
+    ports: ["8000:8000"]
+
+volumes:
+  rag_chroma:
+  rag_uploads:
+  hf_cache:
+  vllm_cache:

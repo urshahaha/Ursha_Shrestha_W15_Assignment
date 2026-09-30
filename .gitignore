@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.env
+.venv/
+venv/
+.DS_Store
+.pytest_cache/
+task1_rag_assistant/chroma_db/
+task1_rag_assistant/uploads/
+task2_production_router/model/**/*.pt
+task2_production_router/model/week14_distilbert_router/model.safetensors
+!task2_production_router/model/.gitkeep
